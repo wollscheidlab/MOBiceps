@@ -26,12 +26,12 @@ setup(
 	'statsmodels==0.13.2'],
     author='Jens Settelmeier',
     author_email='jenssettelmeier@googlemail.com',
-    description='Python tools for Mass Spectrometry data.',
+    description='Python tools for Mass Spectrometry and Omics data.',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown', 
     url='https://github.com/JensSettelmeier/MOBiceps',  
     classifiers=[
-	"License :: OSI Approved :: Apache Software License 2.0",
+	"License :: OSI Approved :: Apache Software License",
         "Programming Language :: Python :: 3.8",
     ],
 )
