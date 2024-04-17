@@ -24,6 +24,7 @@ setup(
 	'torchvision==0.14.1',
 	'torchaudio==0.13.1',
 	'statsmodels==0.13.2'],
+    python_requires='==3.8.*',
     author='Jens Settelmeier',
     author_email='jenssettelmeier@googlemail.com',
     description='Python tools for Mass Spectrometry and Omics data.',

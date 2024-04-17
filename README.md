@@ -15,3 +15,6 @@ or using the python package distribution system pip via
 ```bash
 $ pip install MOBiceps
 ```
+
+## Notes
+Developed and tested under python 3.8. 
