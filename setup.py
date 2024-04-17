@@ -2,7 +2,7 @@
 
 setup(
     name="MOBiceps",
-    version="0.1.1",
+    version="0.1.4",
     packages=find_packages(),
     include_package_data=True,
     install_requires=[
@@ -23,6 +23,7 @@ setup(
 	'torch==1.13.1',
 	'torchvision==0.14.1',
 	'torchaudio==0.13.1',
+	'umap-learn==0.5.3',
 	'statsmodels==0.13.2'],
     python_requires='==3.8.*',
     author='Jens Settelmeier',
