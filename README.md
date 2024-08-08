@@ -5,7 +5,7 @@ If you have any questions please do not hesitate to contact jsettelmeier@ethz.ch
 
 ## Installation
 
-### Dependencies
+## Dependencies
 
 MOBicepcs requires:
 
@@ -69,7 +69,7 @@ with following parameters:
 - `--c` or `--core_number`: Specifies the number of threads to be used to convert all files. -1 corresponds to all possible. (Default: -1)
 
 
-#### Construct Feature Table for Feature Selector using Spectronaut or DIA-NN search output
+### Construct Feature Table for Feature Selector using Spectronaut or DIA-NN search output
 
 Within your code if you installed MOBiceps via pip
 
@@ -91,7 +91,7 @@ with the following parameters:
 - `--m`: Imputation method. Currently "mean", "median", "zero", "gaussian" are supported. (Default: "none")
 - `--f`: Feature level. "peptide" and "protein" are supported. (Default: "peptide")
 
-#### Apply RFE++ to derive predictive features
+### Apply RFE++ to derive predictive features
 
 Within your code if you installed MOBiceps via pip
 
@@ -132,6 +132,6 @@ path_to_output = '.../Demo/output'
 
 most_contributing_features = execute_rfePP(path_to_search_output, path_to_class_annotation, path_to_output) 
 ```
-For the interpretation of the automatic created visualizations in the output folder, please consult out paper doi://to_be_added
+For the interpretation of the automatic created visualizations in the output folder, please consult our paper doi://to_be_added
 
 
