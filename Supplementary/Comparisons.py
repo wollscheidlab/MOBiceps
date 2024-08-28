@@ -147,8 +147,7 @@ plt.legend(loc='lower right')
 plt.savefig(f'Model_comparison.pdf')
 plt.show()
 
-'''
-#%%
+
 import pandas as pd
 from MOBiceps.rfePlusPlusWF import execute_rfePP
 
@@ -170,6 +169,3 @@ y_df.to_csv(path_to_class_annotation, index=False)
 path_to_output = current_path
 
 most_contributing_features = execute_rfePP(path_to_search_output, path_to_class_annotation, path_to_output)
-
-
-'''
