@@ -11,12 +11,13 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
+import matplotlib.patches as mpatches
 import seaborn as sns
 import itertools as it
 from sklearn.decomposition import PCA
 from scipy import stats
 from statsmodels.stats.multitest import multipletests
-from collections import Counter
+from collections import Counter, OrderedDict
 from sklearn.model_selection import (
     RepeatedStratifiedKFold,
     StratifiedKFold,
@@ -289,30 +290,79 @@ def has_nan(df: pd.DataFrame) -> bool:
     return df.isnull().any().any()
 
 
-def expression_heatmap(df, filename="heatmap.pdf"):
+
+def expression_heatmap(df, labels, label_encoding_dic=None, filename="heatmap.pdf"):
     """
-    Generates a heatmap from the given DataFrame and saves it as a .pdf file.
+    Generates a clustered heatmap from the given DataFrame, annotates rows with class colors,
+    performs hierarchical clustering, and saves it as a .pdf file.
 
     Parameters:
     -----------
     df : DataFrame
         The input DataFrame from which the heatmap is generated.
 
+    labels : list or Series
+        List or Pandas Series containing class labels for each row in the DataFrame.
+
     filename : str, optional
-        The name of the output .pdf file. Defaults to '_heatmap.pdf'.
+        The name of the output .pdf file. Defaults to 'heatmap.pdf'.
+
+    method : str, optional
+        Linkage method to use for clustering ('average', 'single', 'complete', etc.).
+
+    metric : str, optional
+        Distance metric to use for clustering ('euclidean', 'correlation', 'cityblock', etc.).
 
     Returns:
     --------
     ax : AxesSubplot
         An AxesSubplot object representing the generated heatmap plot.
     """
-    plt.figure(figsize=(20, 20))
-    plt.ylabel("Samples")
-    plt.xlabel("Features")
-    ax = sns.heatmap(df, cbar=True, yticklabels=True)
-    plt.savefig(filename, format="pdf")
+    if len(labels) != len(df):
+        raise ValueError("Length of `labels` must match the number of rows in `df`.")
+
+    # Create a color palette and map labels to colors
+    sample_labels = labels.to_dict()
+
+    labels_list = [sample_labels[x] for x in df.index]
+    if label_encoding_dic is not None:
+        labels_list = [label_encoding_dic[x] for x in labels_list]
+
+    palette = sns.color_palette("hsv", len(set(labels_list)))
+    color_dict = {label: color for label, color in zip(set(labels_list), palette)}
+    row_colors = [color_dict[label] for label in labels_list] # Map labels to colors for each row
+    # sns.set_context("talk")
+    # Create the heatmap with hierarchical clustering
+    g = sns.clustermap(df, row_colors=row_colors)
+
+    # Access the position of the heatmap within the figure
+    heatmap_pos = g.ax_heatmap.get_position()
+
+    # Extract the top-right corner of the heatmap
+    top_right = (heatmap_pos.x1 + 0.1, heatmap_pos.y1 + 0.15)
+
+    # Add x-axis label for features
+    g.ax_heatmap.set_xlabel('features')
+
+    # Add title to the color bar
+    colorbar = g.cax
+    colorbar.set_ylabel('Feature Intensity')
+
+    # Create a legend
+    legend_title = "Sample Classes"
+    legend_handles = [mpatches.Patch(color=color, label=label) for label, color in color_dict.items()]
+
+    # Add legend relative to the top-right corner of the heatmap
+    g.fig.legend(handles=legend_handles, title=legend_title, loc='upper left', bbox_to_anchor=top_right)
+    g.fig.suptitle('                  Clustered Feature Expression Heatmap')
+    g.fig.subplots_adjust(top=0.95, bottom=0.05, left=0.05, right=0.95, hspace=0.1, wspace=0.1)
+
+
+    # Save the plot
+    plt.savefig(filename, format="pdf", bbox_inches="tight")
     plt.close()
-    return ax
+
+    return g.ax_heatmap
 
 
 def plot_feature_correlation(X_train, most_common_features, sim, method=None):
@@ -2054,13 +2104,6 @@ def robust_crossvalidated_rfe4(
                 f"volcano_data_{label_4_phenotype_class}_vs_rest.csv", index=False
             )
 
-    if print_expression_heatmap is True:
-        print("### Plotting feature expression heatmap ###\n")
-        expression_heatmap(
-            X[np.unique(runs_proteins)],
-            filename="relevant_feature_expression_heatmap_final.pdf",
-        )
-
     if print_corr_hp is True:
         print(
             "### Plotting pearson correlation using most relevant features and all data ###\n"
@@ -2151,6 +2194,17 @@ def robust_crossvalidated_rfe4(
     )
     plt.savefig("xgb_final_features_shap_test_performance.pdf", format="pdf")
     plt.close()
+
+    if print_expression_heatmap is True:
+        label_encoding_df_copy = label_encoding_df.copy()
+        label_encoding_df_copy.set_index('label', inplace=True)
+        label_encoding_dic = label_encoding_df_copy['class'].to_dict()
+        label_encoding_dic_swapped = OrderedDict((value, key) for key, value in label_encoding_dic.items())
+        print("### Plotting feature expression heatmap ###\n")
+        expression_heatmap(
+            X[np.unique(runs_proteins)], y, label_encoding_dic_swapped,
+            filename="relevant_feature_expression_heatmap_final.pdf",
+        )
 
     if experiment_simulations > 1:
         print(
